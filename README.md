@@ -28,7 +28,7 @@ Claims that all models agree on skip deep verification. Claims where any model i
 ### Requirements
 
 - Python 3.10+
-- `pip install litellm` (the plugin will prompt you if this is missing)
+- `pip install litellm` (or `pip3` / `python3 -m pip` — the plugin will prompt you if this is missing)
 
 ### Setting up LLM providers
 

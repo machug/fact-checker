@@ -25,7 +25,7 @@ skills/fact-check/scripts/
 └── sources.py     # MCP detection + source resolution + registry
 ```
 
-**Requires:** `pip install litellm` (if not already installed)
+**Requires:** `pip install litellm` (or `pip3 install litellm` / `python3 -m pip install litellm` if `pip` is not found)
 
 ## Workflow
 
@@ -48,6 +48,8 @@ cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts && python3 verify.py provider
 > - Or install Codex CLI (`npm install -g @openai/codex`) or Gemini CLI (`npm install -g @google/gemini-cli`)
 
 Then ask: "Continue anyway with single-model triage, or set up providers first?" Proceed if the user says to continue.
+
+**IMPORTANT — no simulated triage:** If no external LLMs are available, do NOT launch subagents that role-play or simulate different LLM perspectives. That is not real independent verification — it's just you (Claude) with extra steps. Instead, skip the multi-model triage entirely and flag ALL claims for deep source-grounded verification in Step 5. Be transparent with the user that triage was skipped because no external models were available.
 
 ### Step 1: INGEST
 
