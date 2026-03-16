@@ -28,34 +28,46 @@ Claims that all models agree on skip deep verification. Claims where any model i
 ### Requirements
 
 - Python 3.10+
-- API keys for at least 1-2 LLM providers (set as environment variables)
+- `pip install litellm` (the plugin will prompt you if this is missing)
 
-After installing the plugin, install the Python dependency:
+### Setting up LLM providers
 
+The plugin works best with **2-3 independent LLMs** for cross-checking claims during triage. It will still work without any external providers (Claude handles everything), but you lose the independent verification that catches blind spots.
+
+The plugin auto-detects what's available at runtime — API keys in your environment and installed CLI tools.
+
+**Option 1: Single API key via OpenRouter (easiest)**
+
+[OpenRouter](https://openrouter.ai/) gives you access to models from OpenAI, Google, Anthropic, xAI, and others with one key:
+
+```bash
+export OPENROUTER_API_KEY=sk-or-...
 ```
-pip install litellm
-```
 
-The plugin will prompt you if this is missing.
+**Option 2: Direct provider API keys**
 
-### Supported Providers
+Set one or more of these environment variables:
 
 | Provider | Env Variable |
 |----------|-------------|
-| OpenRouter | `OPENROUTER_API_KEY` |
 | OpenAI | `OPENAI_API_KEY` |
-| Anthropic | `ANTHROPIC_API_KEY` |
 | Google | `GEMINI_API_KEY` |
+| Anthropic | `ANTHROPIC_API_KEY` |
 | xAI | `XAI_API_KEY` |
 | Mistral | `MISTRAL_API_KEY` |
 | Groq | `GROQ_API_KEY` |
 | Deepseek | `DEEPSEEK_API_KEY` |
 
-**Quickest way to get started:** [OpenRouter](https://openrouter.ai/) gives you access to models from OpenAI, Google, Anthropic, xAI, and others with a single API key — no need to create separate accounts with each provider.
+**Option 3: CLI tools (no API key needed)**
 
-Available models and pricing (USD) are discovered dynamically from [LiteLLM's model registry](https://github.com/BerriAI/litellm) — no hardcoded model lists to go stale. Run `python3 verify.py providers` to see what's available with your current keys.
+If you have a ChatGPT or Google subscription, you can use the CLI tools instead:
 
-The plugin auto-detects what's available — it checks for API keys in your environment **and** installed CLI tools. If you have Codex CLI (`@openai/codex`) or Gemini CLI (`@google/gemini-cli`) installed, those work too without needing an API key (they use your existing subscription/account).
+```bash
+npm install -g @openai/codex    # Uses your ChatGPT subscription
+npm install -g @google/gemini-cli  # Uses your Google account
+```
+
+Available models and pricing (USD) are discovered dynamically from [LiteLLM's model registry](https://github.com/BerriAI/litellm) — no hardcoded model lists to go stale. Run `python3 verify.py providers` to see what's detected on your machine.
 
 ## Usage
 
