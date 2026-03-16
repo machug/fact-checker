@@ -1,6 +1,6 @@
 {
   "name": "fact-checker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Systematically verify factual claims in documents using multi-LLM triage and source-grounded verification via MCP servers and web search.",
   "author": {
     "name": "Hugh McIntyre"
