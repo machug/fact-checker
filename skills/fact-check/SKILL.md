@@ -15,9 +15,9 @@ Verify factual claims in research, governance, and reference documents using a h
 
 ## Scripts Location
 
-All scripts are in the skill's `scripts/` directory:
+All scripts are in the skill's `scripts/` directory (relative to the plugin root):
 ```
-~/.claude/plugins/local/fact-checker/skills/fact-check/scripts/
+skills/fact-check/scripts/
 ├── verify.py      # Main orchestrator + CLI
 ├── models.py      # LiteLLM calls, parallel execution, cost tracking
 ├── prompts.py     # Claim extraction + verification prompt templates
@@ -31,13 +31,31 @@ All scripts are in the skill's `scripts/` directory:
 
 Follow these steps in order. Each step has a user checkpoint — do NOT skip ahead without confirmation.
 
+### Step 0: PREFLIGHT CHECK
+
+Before starting, check what LLM providers are available:
+```bash
+cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts && python3 verify.py providers
+```
+
+**If no external providers are found** (no API keys set, no CLI tools installed), warn the user:
+
+> **Warning: No external LLM providers detected.** Multi-LLM triage works best with 2-3 independent models to cross-check claims. Without external models, I'll use my own knowledge for triage — this still works but you lose the independent verification that catches blind spots.
+>
+> **Recommended setup (pick one):**
+> - Set `OPENROUTER_API_KEY` for access to multiple providers with a single key ([openrouter.ai](https://openrouter.ai))
+> - Or set API keys for 2+ providers (e.g. `OPENAI_API_KEY`, `GEMINI_API_KEY`)
+> - Or install Codex CLI (`npm install -g @openai/codex`) or Gemini CLI (`npm install -g @google/gemini-cli`)
+
+Then ask: "Continue anyway with single-model triage, or set up providers first?" Proceed if the user says to continue.
+
 ### Step 1: INGEST
 
 1. Ask the user for the document to verify (file path, or they may have already provided it)
 2. Read the document using the Read tool
 3. Run domain detection:
    ```bash
-   cd ~/.claude/plugins/local/fact-checker/skills/fact-check/scripts && python3 -c "
+   cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts && python3 -c "
    from sources import detect_document_domains, find_relevant_mcps, load_registry
    content = open('<FILE_PATH>').read()
    domains = detect_document_domains(content)
@@ -84,7 +102,7 @@ Follow these steps in order. Each step has a user checkpoint — do NOT skip ahe
 
 1. Check available LLM providers:
    ```bash
-   cd ~/.claude/plugins/local/fact-checker/skills/fact-check/scripts && python3 verify.py providers
+   cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts && python3 verify.py providers
    ```
 
 2. Select 2-3 models from different providers. Pick from whatever is available — run `python3 verify.py providers` to see current models. Aim for diversity across providers, e.g.:
@@ -99,7 +117,7 @@ Follow these steps in order. Each step has a user checkpoint — do NOT skip ahe
 
 3. Run triage — send ALL claims to selected models in parallel:
    ```bash
-   cd ~/.claude/plugins/local/fact-checker/skills/fact-check/scripts && python3 verify.py triage claims.json --models <model1>,<model2>,<model3> --document <FILE_PATH>
+   cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts && python3 verify.py triage claims.json --models <model1>,<model2>,<model3> --document <FILE_PATH>
    ```
 
    **If the CLI triage is not practical** (e.g., claims aren't in a file yet), you can orchestrate triage directly:
@@ -190,7 +208,7 @@ For each flagged claim, perform source-grounded verification:
 
 ```bash
 # Navigate to scripts directory first
-cd ~/.claude/plugins/local/fact-checker/skills/fact-check/scripts
+cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts
 
 # Full pipeline analysis
 python3 verify.py check <file>
