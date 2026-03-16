@@ -1,0 +1,17 @@
+{
+  "name": "machug-fact-checker",
+  "owner": {
+    "name": "Hugh McIntyre"
+  },
+  "metadata": {
+    "description": "Multi-LLM fact-checking plugin for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "fact-checker",
+      "source": ".",
+      "description": "Systematically verify factual claims in documents using multi-LLM triage and source-grounded verification.",
+      "version": "1.0.0"
+    }
+  ]
+}
