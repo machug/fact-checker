@@ -28,8 +28,15 @@ Claims that all models agree on skip deep verification. Claims where any model i
 ### Requirements
 
 - Python 3.10+
-- `pip install litellm`
-- API keys for at least 2 LLM providers (set as environment variables)
+- API keys for at least 1-2 LLM providers (set as environment variables)
+
+After installing the plugin, install the Python dependency:
+
+```
+pip install litellm
+```
+
+The plugin will prompt you if this is missing.
 
 ### Supported Providers
 
