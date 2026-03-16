@@ -12,44 +12,45 @@ from typing import Optional
 PROFILES_DIR = Path.home() / ".config" / "fact-checker" / "profiles"
 GLOBAL_CONFIG_PATH = Path.home() / ".claude" / "fact-checker" / "config.json"
 
-# Cost per 1M tokens (approximate, as of 2026)
-MODEL_COSTS = {
-    # OpenAI GPT-5 family
-    "gpt-5.4": {"input": 2.50, "output": 10.00},
-    "gpt-5.4-pro": {"input": 10.00, "output": 40.00},
-    "gpt-5-mini": {"input": 0.40, "output": 1.60},
-    "gpt-5-nano": {"input": 0.10, "output": 0.40},
-    # OpenAI legacy
-    "gpt-4o": {"input": 2.50, "output": 10.00},
-    "o3": {"input": 10.00, "output": 40.00},
-    # Anthropic Claude
-    "claude-opus-4-6-20250627": {"input": 15.00, "output": 75.00},
-    "claude-sonnet-4-6-20250627": {"input": 3.00, "output": 15.00},
-    "claude-sonnet-4-20250514": {"input": 3.00, "output": 15.00},
-    "claude-opus-4-20250514": {"input": 15.00, "output": 75.00},
-    # Google Gemini
-    "gemini/gemini-2.5-pro": {"input": 1.25, "output": 10.00},
-    "gemini/gemini-2.5-flash": {"input": 0.30, "output": 2.50},
-    "gemini/gemini-2.5-flash-lite": {"input": 0.10, "output": 0.40},
-    "gemini/gemini-2.0-flash": {"input": 0.075, "output": 0.30},
-    # xAI Grok
-    "xai/grok-4-0709": {"input": 3.00, "output": 15.00},
-    "xai/grok-4-fast-reasoning": {"input": 0.20, "output": 0.50},
-    "xai/grok-3": {"input": 3.00, "output": 15.00},
-    "xai/grok-3-mini": {"input": 0.30, "output": 0.50},
-    # Other providers
-    "mistral/mistral-large": {"input": 2.00, "output": 6.00},
-    "groq/llama-3.3-70b-versatile": {"input": 0.59, "output": 0.79},
-    "deepseek/deepseek-chat": {"input": 0.14, "output": 0.28},
-    # Codex CLI (subscription-based)
-    "codex/gpt-5.3-codex": {"input": 0.0, "output": 0.0},
-    "codex/gpt-5.2-codex": {"input": 0.0, "output": 0.0},
-    # Gemini CLI (account-based)
-    "gemini-cli/gemini-3.1-pro-preview": {"input": 0.0, "output": 0.0},
-    "gemini-cli/gemini-3-flash-preview": {"input": 0.0, "output": 0.0},
+# Use LiteLLM's community-maintained model cost registry at runtime.
+# This stays current as users update their litellm package.
+try:
+    from litellm import model_cost as _litellm_model_cost
+except ImportError:
+    _litellm_model_cost = {}
+
+# CLI tools aren't in LiteLLM's registry (subscription/account-based, no per-token cost)
+_CLI_COSTS = {
+    "codex/": {"input": 0.0, "output": 0.0},
+    "gemini-cli/": {"input": 0.0, "output": 0.0},
 }
 
 DEFAULT_COST = {"input": 5.00, "output": 15.00}
+
+
+def get_model_cost(model: str) -> dict[str, float]:
+    """Get cost per 1M tokens for a model, using LiteLLM's registry.
+
+    Falls back to DEFAULT_COST for unknown models.
+    """
+    # CLI tools — free (subscription-based)
+    for prefix, cost in _CLI_COSTS.items():
+        if model.startswith(prefix):
+            return cost
+
+    # Look up in LiteLLM's registry (keys use per-token costs, we convert to per-1M)
+    litellm_key = model.split("/", 1)[1] if "/" in model and model.split("/")[0] in (
+        "gemini", "xai", "mistral", "groq", "deepseek", "openrouter"
+    ) else model
+    for key in (model, litellm_key):
+        if key in _litellm_model_cost:
+            entry = _litellm_model_cost[key]
+            return {
+                "input": entry.get("input_cost_per_token", 0) * 1_000_000,
+                "output": entry.get("output_cost_per_token", 0) * 1_000_000,
+            }
+
+    return DEFAULT_COST
 
 # Check CLI tool availability
 CODEX_AVAILABLE = shutil.which("codex") is not None
@@ -78,15 +79,17 @@ def get_available_providers() -> list[tuple[str, Optional[str], str]]:
     """Get list of providers with configured API keys.
 
     Returns list of (provider_name, env_var, default_model) tuples.
+    Cost lookups are dynamic via LiteLLM's registry — any model ID
+    that LiteLLM supports will work regardless of what's listed here.
     """
     providers = [
+        ("OpenRouter", "OPENROUTER_API_KEY", "openrouter/auto"),
         ("OpenAI", "OPENAI_API_KEY", "gpt-5.4"),
         ("Anthropic", "ANTHROPIC_API_KEY", "claude-sonnet-4-6-20250627"),
         ("Google", "GEMINI_API_KEY", "gemini/gemini-2.5-flash"),
         ("xAI", "XAI_API_KEY", "xai/grok-4-0709"),
         ("Mistral", "MISTRAL_API_KEY", "mistral/mistral-large"),
         ("Groq", "GROQ_API_KEY", "groq/llama-3.3-70b-versatile"),
-        ("OpenRouter", "OPENROUTER_API_KEY", "openrouter/openai/gpt-5.4"),
         ("Deepseek", "DEEPSEEK_API_KEY", "deepseek/deepseek-chat"),
     ]
 
@@ -96,9 +99,9 @@ def get_available_providers() -> list[tuple[str, Optional[str], str]]:
             available.append((name, key, model))
 
     if CODEX_AVAILABLE:
-        available.append(("Codex CLI", None, "codex/gpt-5.3-codex"))
+        available.append(("Codex CLI", None, "codex/latest"))
     if GEMINI_CLI_AVAILABLE:
-        available.append(("Gemini CLI", None, "gemini-cli/gemini-3.1-pro-preview"))
+        available.append(("Gemini CLI", None, "gemini-cli/latest"))
 
     return available
 
@@ -190,22 +193,35 @@ def list_profiles():
             print(f"  {p.stem} [error reading]")
 
 
+def _discover_models_for_provider(provider_prefix: str, max_models: int = 5) -> str:
+    """Discover available models from LiteLLM's registry for a provider prefix."""
+    if not _litellm_model_cost:
+        return "(update litellm for model list)"
+    matches = [k for k in _litellm_model_cost if k.startswith(provider_prefix)]
+    # Sort by name, show up to max_models
+    matches.sort()
+    if len(matches) > max_models:
+        return ", ".join(matches[:max_models]) + f" (+{len(matches) - max_models} more)"
+    return ", ".join(matches) if matches else "(none found in registry)"
+
+
 def list_providers():
     """List all supported providers and their API key status."""
     providers = [
-        ("OpenAI", "OPENAI_API_KEY", "gpt-5.4, gpt-5-mini, gpt-5-nano"),
-        ("Anthropic", "ANTHROPIC_API_KEY", "claude-sonnet-4-6-20250627, claude-opus-4-6-20250627"),
-        ("Google", "GEMINI_API_KEY", "gemini/gemini-2.5-pro, gemini/gemini-2.5-flash"),
-        ("xAI", "XAI_API_KEY", "xai/grok-4-0709, xai/grok-3"),
-        ("Mistral", "MISTRAL_API_KEY", "mistral/mistral-large"),
-        ("Groq", "GROQ_API_KEY", "groq/llama-3.3-70b-versatile"),
-        ("OpenRouter", "OPENROUTER_API_KEY", "openrouter/openai/gpt-5.4"),
-        ("Deepseek", "DEEPSEEK_API_KEY", "deepseek/deepseek-chat"),
+        ("OpenAI", "OPENAI_API_KEY", "gpt-"),
+        ("Anthropic", "ANTHROPIC_API_KEY", "claude-"),
+        ("Google", "GEMINI_API_KEY", "gemini/"),
+        ("xAI", "XAI_API_KEY", "xai/"),
+        ("Mistral", "MISTRAL_API_KEY", "mistral/"),
+        ("Groq", "GROQ_API_KEY", "groq/"),
+        ("OpenRouter", "OPENROUTER_API_KEY", "openrouter/"),
+        ("Deepseek", "DEEPSEEK_API_KEY", "deepseek/"),
     ]
 
     print("Supported providers:\n")
-    for name, key, models in providers:
+    for name, key, prefix in providers:
         status = "[set]" if os.environ.get(key) else "[not set]"
+        models = _discover_models_for_provider(prefix)
         print(f"  {name:12} {key:24} {status}")
         print(f"             Models: {models}")
         print()

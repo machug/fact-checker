@@ -87,10 +87,10 @@ Follow these steps in order. Each step has a user checkpoint — do NOT skip ahe
    cd ~/.claude/plugins/local/fact-checker/skills/fact-check/scripts && python3 verify.py providers
    ```
 
-2. Select 2-3 models from different providers. Default recommendation:
-   - GPT-5.4 (OpenAI)
-   - Gemini 2.5 Flash or Pro (Google)
-   - Grok-4 (xAI)
+2. Select 2-3 models from different providers. Pick from whatever is available — run `python3 verify.py providers` to see current models. Aim for diversity across providers, e.g.:
+   - One OpenAI model
+   - One Google Gemini model
+   - One xAI or other provider model
 
    If user has a saved profile, use that instead:
    ```bash
@@ -99,7 +99,7 @@ Follow these steps in order. Each step has a user checkpoint — do NOT skip ahe
 
 3. Run triage — send ALL claims to selected models in parallel:
    ```bash
-   cd ~/.claude/plugins/local/fact-checker/skills/fact-check/scripts && python3 verify.py triage claims.json --models gpt-5.4,gemini/gemini-2.5-flash,xai/grok-4-0709 --document <FILE_PATH>
+   cd ~/.claude/plugins/local/fact-checker/skills/fact-check/scripts && python3 verify.py triage claims.json --models <model1>,<model2>,<model3> --document <FILE_PATH>
    ```
 
    **If the CLI triage is not practical** (e.g., claims aren't in a file yet), you can orchestrate triage directly:
@@ -199,7 +199,7 @@ python3 verify.py check <file>
 python3 verify.py extract <file>
 
 # Triage extracted claims
-python3 verify.py triage claims.json --models gpt-5.4,gemini/gemini-2.5-flash --document <file>
+python3 verify.py triage claims.json --models <model1>,<model2> --document <file>
 
 # List available LLM providers
 python3 verify.py providers
@@ -209,7 +209,7 @@ python3 verify.py sources
 
 # Manage profiles
 python3 verify.py profiles list
-python3 verify.py profiles save --name gov-check --models gpt-5.4,xai/grok-4-0709
+python3 verify.py profiles save --name gov-check --models <model1>,<model2>
 
 # Manage MCP registry
 python3 verify.py registry list

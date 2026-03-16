@@ -28,9 +28,8 @@ except ImportError:
 from providers import (
     CODEX_AVAILABLE,
     DEFAULT_CODEX_REASONING,
-    DEFAULT_COST,
     GEMINI_CLI_AVAILABLE,
-    MODEL_COSTS,
+    get_model_cost,
 )
 
 MAX_RETRIES = 3
@@ -73,7 +72,7 @@ class CostTracker:
 
     def add(self, model: str, input_tokens: int, output_tokens: int) -> float:
         """Add usage for a model call and return the cost."""
-        costs = MODEL_COSTS.get(model, DEFAULT_COST)
+        costs = get_model_cost(model)
         cost = (input_tokens / 1_000_000 * costs["input"]) + (
             output_tokens / 1_000_000 * costs["output"]
         )
