@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "fact-checker",
-      "source": ".",
+      "source": "./",
       "description": "Systematically verify factual claims in documents using multi-LLM triage and source-grounded verification.",
       "version": "1.0.0"
     }
