@@ -94,7 +94,6 @@ The plugin is MCP-aware — it prefers authoritative sources over web search. Bu
 | microsoft_docs_mcp | Microsoft, Azure, M365, Entra | Official Microsoft Learn documentation |
 | context7 | Libraries, frameworks, SDKs | Up-to-date library/framework docs |
 | deepwiki | GitHub, open-source | Repository documentation and wikis |
-| atlassian | Jira, Confluence | Atlassian product docs |
 
 You can extend the registry with your own MCP servers for custom domain coverage.
 
