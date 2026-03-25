@@ -49,17 +49,6 @@ DEFAULT_REGISTRY: dict[str, dict] = {
         "description": "GitHub repository documentation and wikis",
         "search_instruction": "Use read_wiki_structure first, then ask_question for specifics",
     },
-    "atlassian": {
-        "domains": [
-            "jira", "confluence", "atlassian", "bitbucket",
-        ],
-        "tools": {
-            "search": "mcp__atlassian__search",
-            "fetch": "mcp__atlassian__fetch",
-        },
-        "description": "Atlassian Jira and Confluence",
-        "search_instruction": "Use search for broad queries, fetch for specific URLs",
-    },
 }
 
 # Domain keyword detection for document classification

@@ -264,8 +264,6 @@ The skill ships with a default registry of known MCPs. Users can extend it:
 | microsoft_docs_mcp | Microsoft, Azure, M365, Entra, etc. | Official Microsoft Learn docs |
 | context7 | Libraries, frameworks, SDKs | Up-to-date library documentation |
 | deepwiki | GitHub, open-source repos | Repository docs and wikis |
-| atlassian | Jira, Confluence | Atlassian products |
-
 At runtime:
 1. Check what MCPs are connected
 2. Match document domains to registry
