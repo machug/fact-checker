@@ -21,8 +21,8 @@ Claims that all models agree on skip deep verification. Claims where any model i
 ## Installation
 
 ```
-/plugin marketplace add machug/fact-checker
-/plugin install fact-checker
+/plugin marketplace add machug/marketplace
+/plugin install fact-checker@machug
 ```
 
 ### Requirements
