@@ -98,8 +98,9 @@ def save_registry_addition(name: str, config: dict):
             pass
 
     custom[name] = config
-    REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     REGISTRY_PATH.write_text(json.dumps(custom, indent=2))
+    REGISTRY_PATH.chmod(0o600)
     print(f"Added {name} to MCP registry at {REGISTRY_PATH}")
 
 
@@ -186,6 +187,7 @@ def build_source_plan(
     MCP tool names or "web_search" or "model_knowledge".
     """
     plan: dict[str, list[str]] = {}
+    registry = load_registry()
 
     for claim in claims:
         claim_id = str(claim.get("id", ""))
@@ -195,8 +197,6 @@ def build_source_plan(
         # Match claim to MCPs by checking if claim text relates to MCP domains
         for mcp in available_mcps:
             mcp_name = mcp["name"]
-            # Check against registry domains
-            registry = load_registry()
             mcp_config = registry.get(mcp_name, {})
             mcp_domains = mcp_config.get("domains", [])
 

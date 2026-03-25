@@ -272,8 +272,9 @@ def cmd_extract(args):
     print("--- System Prompt ---")
     print(EXTRACT_CLAIMS_SYSTEM)
     print()
-    print("--- User Prompt ---")
-    print(prompt)
+    print(f"--- User Prompt ({len(prompt)} chars) ---")
+    print("[Document content included in prompt but redacted from terminal output to prevent leakage]")
+    print("Use the extraction prompt programmatically via: from prompts import EXTRACT_CLAIMS_USER")
 
 
 def cmd_triage(args):
@@ -357,9 +358,17 @@ def cmd_registry(args):
     if args.subcommand == "list" or not args.subcommand:
         list_registry()
     elif args.subcommand == "add":
+        tools = {}
+        if args.tools:
+            try:
+                tools = json.loads(args.tools)
+            except json.JSONDecodeError as e:
+                print(f"Error: Invalid JSON for --tools: {e}", file=sys.stderr)
+                print('Expected format: \'{"search": "mcp__name__tool"}\'', file=sys.stderr)
+                sys.exit(1)
         config = {
             "domains": args.domains.split(",") if args.domains else [],
-            "tools": json.loads(args.tools) if args.tools else {},
+            "tools": tools,
             "description": args.description or "",
         }
         save_registry_addition(args.name, config)

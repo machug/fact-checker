@@ -73,8 +73,9 @@ def load_global_config() -> dict:
 
 def save_global_config(config: dict):
     """Save global config."""
-    GLOBAL_CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    GLOBAL_CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     GLOBAL_CONFIG_PATH.write_text(json.dumps(config, indent=2))
+    GLOBAL_CONFIG_PATH.chmod(0o600)
 
 
 def get_available_providers() -> list[tuple[str, Optional[str], str]]:
@@ -167,9 +168,10 @@ def load_profile(profile_name: str) -> dict:
 
 def save_profile(profile_name: str, config: dict):
     """Save a profile to disk."""
-    PROFILES_DIR.mkdir(parents=True, exist_ok=True)
+    PROFILES_DIR.mkdir(parents=True, exist_ok=True, mode=0o700)
     profile_path = PROFILES_DIR / f"{profile_name}.json"
     profile_path.write_text(json.dumps(config, indent=2))
+    profile_path.chmod(0o600)
     print(f"Profile saved to {profile_path}")
 
 
