@@ -3,6 +3,9 @@ __pycache__/
 *.pyo
 .env
 
+# claude-mem annotations
+CLAUDE.md
+
 # skills.sh local installs
 .agents/
 .crush/
