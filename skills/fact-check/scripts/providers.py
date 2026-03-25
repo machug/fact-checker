@@ -52,9 +52,11 @@ def get_model_cost(model: str) -> dict[str, float]:
 
     return DEFAULT_COST
 
-# Check CLI tool availability
-CODEX_AVAILABLE = shutil.which("codex") is not None
-GEMINI_CLI_AVAILABLE = shutil.which("gemini") is not None
+# Check CLI tool availability — resolve to absolute paths to avoid PATH hijacking
+CODEX_PATH = shutil.which("codex")
+GEMINI_CLI_PATH = shutil.which("gemini")
+CODEX_AVAILABLE = CODEX_PATH is not None
+GEMINI_CLI_AVAILABLE = GEMINI_CLI_PATH is not None
 DEFAULT_CODEX_REASONING = "xhigh"
 
 

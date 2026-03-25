@@ -27,8 +27,10 @@ except ImportError:
 
 from providers import (
     CODEX_AVAILABLE,
+    CODEX_PATH,
     DEFAULT_CODEX_REASONING,
     GEMINI_CLI_AVAILABLE,
+    GEMINI_CLI_PATH,
     get_model_cost,
 )
 
@@ -162,7 +164,7 @@ def call_codex_model(
     full_prompt = f"SYSTEM INSTRUCTIONS:\n{system_prompt}\n\nUSER REQUEST:\n{user_message}"
 
     cmd = [
-        "codex", "exec", "--json", "--full-auto", "--skip-git-repo-check",
+        CODEX_PATH, "exec", "--json", "--full-auto", "--skip-git-repo-check",
         "--model", actual_model,
         "-c", f'model_reasoning_effort="{reasoning_effort}"',
         full_prompt,
@@ -207,7 +209,7 @@ def call_gemini_cli_model(
     actual_model = model.split("/", 1)[1] if "/" in model else model
     full_prompt = f"SYSTEM INSTRUCTIONS:\n{system_prompt}\n\nUSER REQUEST:\n{user_message}"
 
-    cmd = ["gemini", "-m", actual_model, "-y"]
+    cmd = [GEMINI_CLI_PATH, "-m", actual_model, "-y"]
     result = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=timeout)
 
     if result.returncode != 0:
@@ -331,6 +333,8 @@ def triage_claims_parallel(
     timeout: int = 600,
 ) -> list[TriageResponse]:
     """Call multiple models in parallel for claim triage."""
+    if not models:
+        return []
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(models)) as executor:
         future_to_model = {
