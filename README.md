@@ -20,9 +20,17 @@ Claims that all models agree on skip deep verification. Claims where any model i
 
 ## Installation
 
+**Option A: Claude Code marketplace** (recommended — includes auto-updates)
+
 ```
 /plugin marketplace add machug/marketplace
 /plugin install fact-checker@machug
+```
+
+**Option B: skills.sh** (works across Claude Code, Cursor, Copilot, Gemini CLI, and more)
+
+```bash
+npx skills add machug/fact-checker
 ```
 
 ### Requirements
