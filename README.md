@@ -61,6 +61,7 @@ Set one or more of these environment variables:
 | OpenAI | `OPENAI_API_KEY` |
 | Google | `GEMINI_API_KEY` |
 | Anthropic | `ANTHROPIC_API_KEY` |
+| Azure AI Foundry | `AZURE_AI_API_KEY` + `AZURE_AI_API_BASE` |
 | xAI | `XAI_API_KEY` |
 | Mistral | `MISTRAL_API_KEY` |
 | Groq | `GROQ_API_KEY` |
@@ -75,7 +76,9 @@ npm install -g @openai/codex    # Uses your ChatGPT subscription
 npm install -g @google/gemini-cli  # Uses your Google account
 ```
 
-Available models and pricing (USD) are discovered dynamically from [LiteLLM's model registry](https://github.com/BerriAI/litellm) — no hardcoded model lists to go stale. Run `python3 verify.py providers` to see what's detected on your machine.
+Azure AI Foundry models use the `foundry/<deployment-name>` prefix and the `azure-ai-inference` SDK (not LiteLLM). Set `AZURE_AI_API_BASE` to your project endpoint (e.g. `https://your-resource.services.ai.azure.com/api/projects/your-project`).
+
+All other models and pricing (USD) are discovered dynamically from [LiteLLM's model registry](https://github.com/BerriAI/litellm) — no hardcoded model lists to go stale. Run `python3 verify.py providers` to see what's detected on your machine.
 
 ## Usage
 
