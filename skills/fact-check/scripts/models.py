@@ -152,6 +152,54 @@ def parse_triage_response(response_text: str) -> dict[str, dict]:
     return verdicts
 
 
+def call_foundry_model(
+    system_prompt: str, user_message: str, model: str, timeout: int = 600,
+) -> tuple[str, int, int]:
+    """Call Azure AI Foundry v2 using the azure-ai-inference SDK.
+
+    Returns (response_text, input_tokens, output_tokens).
+    """
+    from azure.ai.inference import ChatCompletionsClient
+    from azure.ai.inference.models import SystemMessage, UserMessage
+    from azure.core.credentials import AzureKeyCredential
+
+    api_key = os.environ.get("AZURE_AI_API_KEY")
+    api_base = os.environ.get("AZURE_AI_API_BASE", "")
+
+    if not api_key:
+        raise ValueError("AZURE_AI_API_KEY environment variable not set")
+
+    # Derive the /models endpoint from the base URL
+    endpoint = api_base.rstrip("/")
+    if not endpoint.endswith("/models"):
+        parts = endpoint.split(".services.ai.azure.com")
+        if len(parts) == 2:
+            endpoint = parts[0] + ".services.ai.azure.com/models"
+        else:
+            endpoint = endpoint + "/models"
+
+    deployment_name = model.split("/", 1)[1] if "/" in model else model
+
+    client = ChatCompletionsClient(
+        endpoint=endpoint,
+        credential=AzureKeyCredential(api_key),
+    )
+
+    response = client.complete(
+        messages=[
+            SystemMessage(content=system_prompt),
+            UserMessage(content=user_message),
+        ],
+        model=deployment_name,
+    )
+
+    content = response.choices[0].message.content or ""
+    input_tokens = response.usage.prompt_tokens if response.usage else 0
+    output_tokens = response.usage.completion_tokens if response.usage else 0
+
+    return content, input_tokens, output_tokens
+
+
 def call_codex_model(
     system_prompt: str, user_message: str, model: str,
     reasoning_effort: str = DEFAULT_CODEX_REASONING, timeout: int = 600,
@@ -263,6 +311,26 @@ def call_single_model_triage(
         for attempt in range(MAX_RETRIES):
             try:
                 content, in_tok, out_tok = call_gemini_cli_model(
+                    system_prompt, user_message, model, timeout=timeout,
+                )
+                verdicts = parse_triage_response(content)
+                cost = cost_tracker.add(model, in_tok, out_tok)
+                return TriageResponse(
+                    model=model, response=content, verdicts=verdicts,
+                    input_tokens=in_tok, output_tokens=out_tok, cost=cost,
+                )
+            except Exception as e:
+                last_error = str(e)
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_BASE_DELAY * (2 ** attempt))
+        return TriageResponse(model=model, response="", verdicts={}, error=last_error)
+
+    # Azure AI Foundry path
+    if model.startswith("foundry/"):
+        last_error = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                content, in_tok, out_tok = call_foundry_model(
                     system_prompt, user_message, model, timeout=timeout,
                 )
                 verdicts = parse_triage_response(content)

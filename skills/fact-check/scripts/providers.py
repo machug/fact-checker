@@ -94,6 +94,7 @@ def get_available_providers() -> list[tuple[str, Optional[str], str]]:
         ("Mistral", "MISTRAL_API_KEY", "mistral/mistral-large"),
         ("Groq", "GROQ_API_KEY", "groq/llama-3.3-70b-versatile"),
         ("Deepseek", "DEEPSEEK_API_KEY", "deepseek/deepseek-chat"),
+        # Azure AI Foundry skipped from auto-detect — deployment names are user-specific
     ]
 
     available: list[tuple[str, Optional[str], str]] = []
@@ -119,6 +120,7 @@ def validate_model_credentials(models: list[str]) -> tuple[list[str], list[str]]
         "claude-": "ANTHROPIC_API_KEY",
         "gemini/": "GEMINI_API_KEY",
         "xai/": "XAI_API_KEY",
+        "foundry/": "AZURE_AI_API_KEY",
         "mistral/": "MISTRAL_API_KEY",
         "groq/": "GROQ_API_KEY",
         "deepseek/": "DEEPSEEK_API_KEY",
@@ -229,6 +231,14 @@ def list_providers():
         print(f"  {name:12} {key:24} {status}")
         print(f"             Models: {models}")
         print()
+
+    # Azure AI Foundry (uses azure-ai-inference SDK, not litellm)
+    foundry_status = "[set]" if os.environ.get("AZURE_AI_API_KEY") else "[not set]"
+    print(f"  {'Azure AI':12} {'AZURE_AI_API_KEY':24} {foundry_status}")
+    print(f"             Models: foundry/<your-deployment-name> (uses azure-ai-inference SDK)")
+    if os.environ.get("AZURE_AI_API_BASE"):
+        print(f"             Endpoint: {os.environ['AZURE_AI_API_BASE']}")
+    print()
 
     codex_status = "[installed]" if CODEX_AVAILABLE else "[not installed]"
     print(f"  {'Codex CLI':12} {'(ChatGPT subscription)':24} {codex_status}")
