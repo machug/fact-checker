@@ -94,6 +94,8 @@ def get_available_providers() -> list[tuple[str, Optional[str], str]]:
         ("Mistral", "MISTRAL_API_KEY", "mistral/mistral-large"),
         ("Groq", "GROQ_API_KEY", "groq/llama-3.3-70b-versatile"),
         ("Deepseek", "DEEPSEEK_API_KEY", "deepseek/deepseek-chat"),
+        ("ZAI (GLM)", "ZAI_API_KEY", "zai/glm-5"),
+        ("Moonshot (Kimi)", "MOONSHOT_API_KEY", "moonshot/kimi-k2.5"),
         # Azure AI Foundry skipped from auto-detect — deployment names are user-specific
     ]
 
@@ -124,6 +126,9 @@ def validate_model_credentials(models: list[str]) -> tuple[list[str], list[str]]
         "mistral/": "MISTRAL_API_KEY",
         "groq/": "GROQ_API_KEY",
         "deepseek/": "DEEPSEEK_API_KEY",
+        "zai/": "ZAI_API_KEY",
+        "zhipu/": "ZHIPUAI_API_KEY",  # Legacy prefix, use zai/ instead
+        "moonshot/": "MOONSHOT_API_KEY",
         "codex/": None,
         "gemini-cli/": None,
     }
@@ -222,6 +227,8 @@ def list_providers():
         ("Groq", "GROQ_API_KEY", "groq/"),
         ("OpenRouter", "OPENROUTER_API_KEY", "openrouter/"),
         ("Deepseek", "DEEPSEEK_API_KEY", "deepseek/"),
+        ("ZAI (GLM)", "ZAI_API_KEY", "zai/"),
+        ("Moonshot (Kimi)", "MOONSHOT_API_KEY", "moonshot/"),
     ]
 
     print("Supported providers:\n")
