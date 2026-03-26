@@ -1,37 +1,37 @@
 """Tests for model utilities in models.py."""
 
-from models import is_fixed_temperature_model, CostTracker, parse_triage_response
+from models import is_reasoning_model, CostTracker, parse_triage_response
 
 
 class TestIsFixedTemperatureModel:
     def test_o1_model(self):
-        assert is_fixed_temperature_model("o1") is True
-        assert is_fixed_temperature_model("o1-preview") is True
+        assert is_reasoning_model("o1") is True
+        assert is_reasoning_model("o1-preview") is True
 
     def test_o3_model(self):
-        assert is_fixed_temperature_model("o3") is True
-        assert is_fixed_temperature_model("o3-mini") is True
+        assert is_reasoning_model("o3") is True
+        assert is_reasoning_model("o3-mini") is True
 
     def test_o4_model(self):
-        assert is_fixed_temperature_model("o4-mini") is True
+        assert is_reasoning_model("o4-mini") is True
 
     def test_o_series_with_prefix(self):
-        assert is_fixed_temperature_model("openai/o3-mini") is True
-        assert is_fixed_temperature_model("openrouter/o4-mini") is True
+        assert is_reasoning_model("openai/o3-mini") is True
+        assert is_reasoning_model("openrouter/o4-mini") is True
 
     def test_gpt5(self):
-        assert is_fixed_temperature_model("gpt-5.4") is True
-        assert is_fixed_temperature_model("gpt-5-mini") is True
-        assert is_fixed_temperature_model("openai/gpt-5.4") is True
+        assert is_reasoning_model("gpt-5.4") is True
+        assert is_reasoning_model("gpt-5-mini") is True
+        assert is_reasoning_model("openai/gpt-5.4") is True
 
     def test_regular_models_are_not_fixed(self):
-        assert is_fixed_temperature_model("claude-sonnet-4-6") is False
-        assert is_fixed_temperature_model("gemini/gemini-2.5-flash") is False
-        assert is_fixed_temperature_model("gpt-4o") is False
+        assert is_reasoning_model("claude-sonnet-4-6") is False
+        assert is_reasoning_model("gemini/gemini-2.5-flash") is False
+        assert is_reasoning_model("gpt-4o") is False
 
     def test_case_insensitive(self):
-        assert is_fixed_temperature_model("O3-Mini") is True
-        assert is_fixed_temperature_model("GPT-5.4") is True
+        assert is_reasoning_model("O3-Mini") is True
+        assert is_reasoning_model("GPT-5.4") is True
 
 
 class TestCostTracker:

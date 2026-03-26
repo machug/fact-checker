@@ -38,8 +38,13 @@ MAX_RETRIES = 3
 RETRY_BASE_DELAY = 1.0
 
 
-def is_fixed_temperature_model(model: str) -> bool:
-    """Check if a model requires default temperature."""
+def is_reasoning_model(model: str) -> bool:
+    """Check if a model is a reasoning model (o-series, gpt-5).
+
+    Reasoning models differ from standard models:
+    - They ignore the temperature parameter (fixed internally)
+    - They use max_completion_tokens instead of max_tokens
+    """
     model_lower = model.lower()
     if model_lower.startswith(("o1", "o3", "o4")) or any(
         f"/{p}" in model_lower for p in ("o1", "o3", "o4")
@@ -357,9 +362,10 @@ def call_single_model_triage(
                 ],
                 "timeout": timeout,
             }
-            if "gpt-5" not in model.lower():
+            if is_reasoning_model(model):
+                kwargs["max_completion_tokens"] = 8000
+            else:
                 kwargs["max_tokens"] = 8000
-            if not is_fixed_temperature_model(model):
                 kwargs["temperature"] = 0.3  # Lower temp for factual assessment
 
             response = completion(**kwargs)
