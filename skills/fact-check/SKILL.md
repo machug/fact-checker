@@ -6,7 +6,7 @@ allowed-tools: Bash, Read, Write, Edit, Agent, AskUserQuestion, WebFetch, WebSea
 
 # Fact-Check: Document Accuracy Verification
 
-**When this skill is first loaded, display the following banner to the user before doing anything else:**
+**If the user asks to see the banner, NFO, or splash screen, display the following:**
 
 ```
                      ▄▄                          ▄▄
@@ -32,7 +32,7 @@ allowed-tools: Bash, Read, Write, Edit, Agent, AskUserQuestion, WebFetch, WebSea
           ║                                                  ║
           ║  Skill.......: fact-checker                      ║
           ║  Author......: machug          (hughtec.com)     ║
-          ║  Version.....: 1.3.1                             ║
+          ║  Version.....: 1.3.2                             ║
           ║  Released....: 2026                              ║
           ║  License.....: MIT                               ║
           ║  Requires....: Python 3.10+, litellm             ║
