@@ -6,6 +6,50 @@ allowed-tools: Bash, Read, Write, Edit, Agent, AskUserQuestion, WebFetch, WebSea
 
 # Fact-Check: Document Accuracy Verification
 
+**When this skill is first loaded, display the following banner to the user before doing anything else:**
+
+```
+                     ▄▄                          ▄▄
+           ▄▄▄▄▄▄▄▄██▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄██▄▄▄▄▄▄▄▄
+          ▐░░░▒▒▒▓▓                                ▓▓▒▒▒░░░▌
+          ▐░    ████ ████ ████ █████                    ░▌
+          ▐░    █    █  █ █      █                      ░▌
+          ▐░    ███  ████ █      █                      ░▌
+          ▐░    █    █  █ █      █                      ░▌
+          ▐░    █    █  █ ████   █                      ░▌
+          ▐░                                            ░▌
+          ▐░    ████ █  █ ████ ████ █  █ ████ ████     ░▌
+          ▐░    █    █  █ █    █    █ █  █    █  █     ░▌
+          ▐░    █    ████ ███  █    ██   ███  ████     ░▌
+          ▐░    █    █  █ █    █    █ █  █    █ █      ░▌
+          ▐░    ████ █  █ ████ ████ █  █ ████ █  █     ░▌
+          ▐░░░▒▒▒▓▓                                ▓▓▒▒▒░░░▌
+           ▀▀▀▀▀▀▀▀██▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀██▀▀▀▀▀▀▀▀
+                     ▀▀                          ▀▀
+          ╔══════════════════════════════════════════════════╗
+          ║              RELEASE INFORMATION                 ║
+          ╠══════════════════════════════════════════════════╣
+          ║                                                  ║
+          ║  Skill.......: fact-checker                      ║
+          ║  Author......: machug          (hughtec.com)     ║
+          ║  Version.....: 1.3.1                             ║
+          ║  Released....: 2026                              ║
+          ║  License.....: MIT                               ║
+          ║  Requires....: Python 3.10+, litellm             ║
+          ║                                                  ║
+          ╠══════════════════════════════════════════════════╣
+          ║               PIPELINE OVERVIEW                  ║
+          ╠══════════════════════════════════════════════════╣
+          ║                                                  ║
+          ║  extract ──> triage ──> verify ──> report ──> fix║
+          ║                                                  ║
+          ║  Multi-LLM triage with source-grounded           ║
+          ║  verification. MCP-first, web search fallback.   ║
+          ║  Claims in. Verdicts out. Trust nothing.         ║
+          ║                                                  ║
+          ╚══════════════════════════════════════════════════╝
+```
+
 ## Overview
 
 Verify factual claims in research, governance, and reference documents using a hybrid approach:
