@@ -49,8 +49,8 @@ class TestValidateModelCredentials:
 
     def test_gemini_api(self, monkeypatch):
         monkeypatch.setenv("GEMINI_API_KEY", "test")
-        valid, _ = validate_model_credentials(["gemini/gemini-2.5-flash"])
-        assert "gemini/gemini-2.5-flash" in valid
+        valid, _ = validate_model_credentials(["gemini/gemini-3.1-pro-preview"])
+        assert "gemini/gemini-3.1-pro-preview" in valid
 
     def test_unknown_prefix_assumed_valid(self, monkeypatch):
         """Models with no recognized prefix are assumed valid (e.g. openrouter passthrough)."""

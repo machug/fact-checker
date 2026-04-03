@@ -26,7 +26,7 @@ class TestIsFixedTemperatureModel:
 
     def test_regular_models_are_not_fixed(self):
         assert is_reasoning_model("claude-sonnet-4-6") is False
-        assert is_reasoning_model("gemini/gemini-2.5-flash") is False
+        assert is_reasoning_model("gemini/gemini-3.1-pro-preview") is False
         assert is_reasoning_model("gpt-4o") is False
 
     def test_case_insensitive(self):
