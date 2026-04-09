@@ -90,7 +90,7 @@ def get_available_providers() -> list[tuple[str, Optional[str], str]]:
         ("OpenAI", "OPENAI_API_KEY", "gpt-5.4"),
         ("Anthropic", "ANTHROPIC_API_KEY", "claude-sonnet-4-6-20250627"),
         ("Google", "GEMINI_API_KEY", "gemini/gemini-3.1-pro-preview"),
-        ("xAI", "XAI_API_KEY", "xai/grok-4-1-fast-reasoning"),
+        ("xAI", "XAI_API_KEY", "xai/grok-4.20-0309-reasoning"),
         ("Mistral", "MISTRAL_API_KEY", "mistral/mistral-large"),
         ("Groq", "GROQ_API_KEY", "groq/llama-3.3-70b-versatile"),
         ("Deepseek", "DEEPSEEK_API_KEY", "deepseek/deepseek-chat"),
