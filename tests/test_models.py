@@ -24,6 +24,13 @@ class TestIsFixedTemperatureModel:
         assert is_reasoning_model("gpt-5-mini") is True
         assert is_reasoning_model("openai/gpt-5.4") is True
 
+    def test_xai_reasoning_models(self):
+        assert is_reasoning_model("xai/grok-4-1-fast-reasoning") is True
+        assert is_reasoning_model("xai/grok-4-fast-reasoning") is True
+        assert is_reasoning_model("xai/grok-4.20-0309-reasoning") is True
+        assert is_reasoning_model("xai/grok-4-0709") is False
+        assert is_reasoning_model("xai/grok-4-1-fast-non-reasoning") is False
+
     def test_regular_models_are_not_fixed(self):
         assert is_reasoning_model("claude-sonnet-4-6") is False
         assert is_reasoning_model("gemini/gemini-3.1-pro-preview") is False
