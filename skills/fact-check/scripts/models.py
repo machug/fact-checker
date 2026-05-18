@@ -237,38 +237,54 @@ def call_codex_model(
     full_prompt = f"SYSTEM INSTRUCTIONS:\n{system_prompt}\n\nUSER REQUEST:\n{user_message}"
 
     cmd = [
-        CODEX_PATH, "exec", "--json", "--full-auto", "--skip-git-repo-check",
+        CODEX_PATH, "exec", "--json", "--sandbox", "workspace-write",
+        "--skip-git-repo-check",
         "--model", actual_model,
         "-c", f'model_reasoning_effort="{reasoning_effort}"',
         full_prompt,
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    if result.returncode != 0:
-        raise RuntimeError(f"Codex CLI failed: {result.stderr.strip()}")
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, timeout=timeout,
+        stdin=subprocess.DEVNULL,
+    )
 
     response_text = ""
     input_tokens = 0
     output_tokens = 0
+    structured_error = None
 
     for line in result.stdout.strip().split("\n"):
         if not line.strip():
             continue
         try:
             event = json.loads(line)
-            if event.get("type") == "item.completed":
-                item = event.get("item", {})
-                if item.get("type") == "agent_message":
-                    response_text = item.get("text", "")
-            if event.get("type") == "turn.completed":
-                usage = event.get("usage", {})
-                input_tokens = usage.get("input_tokens", 0)
-                output_tokens = usage.get("output_tokens", 0)
         except json.JSONDecodeError:
             continue
+        etype = event.get("type")
+        if etype == "item.completed":
+            item = event.get("item", {})
+            if item.get("type") == "agent_message":
+                response_text = item.get("text", "")
+        elif etype == "turn.completed":
+            usage = event.get("usage", {})
+            input_tokens = usage.get("input_tokens", 0)
+            output_tokens = usage.get("output_tokens", 0)
+        elif etype in ("error", "turn.failed"):
+            msg = event.get("message") or event.get("error", {}).get("message")
+            if msg:
+                structured_error = msg
+
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Codex CLI failed: {structured_error or result.stderr.strip() or f'exited with code {result.returncode}'}"
+        )
 
     if not response_text:
-        raise RuntimeError("No agent message in Codex output")
+        raise RuntimeError(
+            f"No agent message in Codex output: {structured_error}" if structured_error
+            else "No agent message in Codex output"
+        )
     return response_text, input_tokens, output_tokens
 
 
