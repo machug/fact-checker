@@ -32,7 +32,7 @@ allowed-tools: Bash, Read, Write, Edit, Agent, AskUserQuestion, WebFetch, WebSea
           ║                                                  ║
           ║  Skill.......: fact-checker                      ║
           ║  Author......: machug          (hughtec.com)     ║
-          ║  Version.....: 1.3.2                             ║
+          ║  Version.....: 1.4.0                             ║
           ║  Released....: 2026                              ║
           ║  License.....: MIT                               ║
           ║  Requires....: Python 3.10+, litellm             ║
@@ -90,7 +90,7 @@ cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts && python3 verify.py provider
 > - Set `OPENROUTER_API_KEY` for access to multiple providers with a single key ([openrouter.ai](https://openrouter.ai))
 > - Or set API keys for 2+ providers (e.g. `OPENAI_API_KEY`, `GEMINI_API_KEY`)
 > - Or set `AZURE_AI_API_KEY` + `AZURE_AI_API_BASE` for Azure AI Foundry models (use `foundry/<deployment-name>` prefix)
-> - Or install Codex CLI (`npm install -g @openai/codex`) or Gemini CLI (`npm install -g @google/gemini-cli`)
+> - Or install Codex CLI (`npm install -g @openai/codex`) or Antigravity CLI (`curl -fsSL https://antigravity.google/cli/install.sh | bash`, then run `agy` once to sign in)
 
 Then ask: "Continue anyway with single-model triage, or set up providers first?" Proceed if the user says to continue.
 
