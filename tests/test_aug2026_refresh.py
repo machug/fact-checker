@@ -270,6 +270,22 @@ class TestAntigravityProvider:
             with pytest.raises(RuntimeError, match="No response text"):
                 models.call_antigravity_model("sys", "user", "antigravity")
 
+    def test_call_oversized_prompt_raises_clear_error(self):
+        import errno as _errno
+
+        with (
+            patch("models.ANTIGRAVITY_AVAILABLE", True),
+            patch("models.ANTIGRAVITY_PATH", "/usr/bin/agy"),
+            patch(
+                "models.subprocess.run",
+                side_effect=OSError(_errno.E2BIG, "Argument list too long"),
+            ),
+        ):
+            with pytest.raises(RuntimeError, match="argument-size limit") as exc:
+                models.call_antigravity_model("sys", "x" * 200_000, "antigravity")
+        # Deterministic — must not be retried
+        assert models.is_non_retryable_error(str(exc.value))
+
     def test_call_falls_back_to_raw_text_output(self):
         fake = type(
             "P", (), {"returncode": 0, "stdout": "plain text answer", "stderr": ""}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+import errno
 import json
 import os
 import re
@@ -57,6 +58,7 @@ NON_RETRYABLE_PATTERNS = (
     # Antigravity CLI deterministic failures
     "is not authenticated",
     "invalid model selection",
+    "exceeds the os argument-size limit",
 )
 
 CODEX_CHATGPT_HINT = (
@@ -422,6 +424,18 @@ def call_antigravity_model(
         raise RuntimeError(f"Antigravity CLI timed out after {timeout}s")
     except FileNotFoundError:
         raise RuntimeError("Antigravity CLI not found in PATH")
+    except OSError as e:
+        # agy takes the prompt as an argv element (it has no stdin/file prompt
+        # channel), so a very large document blows the per-argument OS limit
+        # (~128 KiB on Linux) with E2BIG before agy even starts.
+        if e.errno == errno.E2BIG:
+            raise RuntimeError(
+                "Antigravity CLI prompt exceeds the OS argument-size limit "
+                f"({len(full_prompt):,} chars). agy cannot read prompts from "
+                "stdin — use an API-key provider (e.g. gemini/<model>) for "
+                "documents this large."
+            )
+        raise
 
     stdout = result.stdout.strip()
 
