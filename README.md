@@ -66,6 +66,9 @@ Set one or more of these environment variables:
 | Mistral | `MISTRAL_API_KEY` |
 | Groq | `GROQ_API_KEY` |
 | Deepseek | `DEEPSEEK_API_KEY` |
+| ZAI (GLM) | `ZAI_API_KEY` |
+| Moonshot (Kimi) | `MOONSHOT_API_KEY` |
+| MiniMax | `MINIMAX_API_KEY` |
 
 **Option 3: CLI tools (no API key needed)**
 
@@ -73,8 +76,12 @@ If you have a ChatGPT or Google subscription, you can use the CLI tools instead:
 
 ```bash
 npm install -g @openai/codex    # Uses your ChatGPT subscription
-npm install -g @google/gemini-cli  # Uses your Google account
+curl -fsSL https://antigravity.google/cli/install.sh | bash  # Uses your Google account (run `agy` once to sign in)
 ```
+
+Codex models use the `codex/<model>` prefix (e.g. `codex/gpt-5.6-sol`). Note: ChatGPT-account auth serves only the current ChatGPT lineup (gpt-5.6-sol/terra/luna, gpt-5.5) — other models need Codex API-key auth or `OPENAI_API_KEY`.
+
+Antigravity models use the `antigravity/<slug>` prefix (e.g. `antigravity/gemini-3.1-pro-high`); run `agy models` to list available slugs. Antigravity replaced Gemini CLI, whose consumer service was retired 2026-06-18 — the `gemini-cli/` prefix still works for enterprise licenses only.
 
 Azure AI Foundry models use the `foundry/<deployment-name>` prefix and the `azure-ai-inference` SDK (not LiteLLM). Set `AZURE_AI_API_BASE` to your project endpoint (e.g. `https://your-resource.services.ai.azure.com/api/projects/your-project`).
 

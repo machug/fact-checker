@@ -28,6 +28,8 @@ from providers import (
     load_profile,
     save_profile,
     validate_model_credentials,
+    warn_codex_chatgpt_model_support,
+    warn_openai_base_url_override,
 )
 from sources import (
     build_source_plan,
@@ -286,6 +288,10 @@ def cmd_triage(args):
         print(f"Error: Missing credentials for: {', '.join(invalid)}", file=sys.stderr)
         print("Run: python3 verify.py providers", file=sys.stderr)
         sys.exit(1)
+
+    # Preflight warnings for common misconfigurations
+    warn_codex_chatgpt_model_support(valid)
+    warn_openai_base_url_override(valid)
 
     # Read claims from JSON file
     claims_path = Path(args.claims)
