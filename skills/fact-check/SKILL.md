@@ -32,7 +32,7 @@ allowed-tools: Bash, Read, Write, Edit, Agent, AskUserQuestion, WebFetch, WebSea
           ║                                                  ║
           ║  Skill.......: fact-checker                      ║
           ║  Author......: machug          (hughtec.com)     ║
-          ║  Version.....: 1.4.0                             ║
+          ║  Version.....: 1.4.1                             ║
           ║  Released....: 2026                              ║
           ║  License.....: MIT                               ║
           ║  Requires....: Python 3.10+, litellm             ║
@@ -62,6 +62,7 @@ Verify factual claims in research, governance, and reference documents using a h
 All scripts are in the skill's `scripts/` directory (relative to the plugin root):
 ```
 skills/fact-check/scripts/
+├── bootstrap.sh   # Prints a Python interpreter that can import litellm
 ├── verify.py      # Main orchestrator + CLI
 ├── models.py      # LiteLLM calls, parallel execution, cost tracking
 ├── prompts.py     # Claim extraction + verification prompt templates
@@ -69,7 +70,26 @@ skills/fact-check/scripts/
 └── sources.py     # MCP detection + source resolution + registry
 ```
 
-**Requires:** `pip install litellm` (or `pip3 install litellm` / `python3 -m pip install litellm` if `pip` is not found)
+## Setup
+
+Run this FIRST, once per session, before any other command. It prints the path to
+a Python interpreter that can import `litellm`, installing one into a cache
+directory (`~/.cache/fact-checker/venv`, override with `FACT_CHECKER_VENV`) only
+if no working interpreter already exists:
+
+```bash
+cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts
+FACT_CHECKER_PY=$(bash bootstrap.sh)
+```
+
+Use `"$FACT_CHECKER_PY"` in place of `python3` for every command below.
+
+**Do NOT improvise a dependency install.** If `bootstrap.sh` fails, report its
+stderr to the user rather than hand-rolling a `pip install` or a venv.
+
+**Trap:** `litellm` exposes no `__version__` attribute. Verifying an install with
+`litellm.__version__` raises `AttributeError` and makes a working install look
+broken. Use `importlib.metadata.version("litellm")` — `bootstrap.sh` already does.
 
 ## Workflow
 
@@ -255,8 +275,9 @@ For each flagged claim, perform source-grounded verification:
 ## CLI Reference
 
 ```bash
-# Navigate to scripts directory first
+# Navigate to scripts directory and resolve the interpreter first
 cd ${CLAUDE_PLUGIN_ROOT}/skills/fact-check/scripts
+FACT_CHECKER_PY=$(bash bootstrap.sh)
 
 # Full pipeline analysis
 python3 verify.py check <file>

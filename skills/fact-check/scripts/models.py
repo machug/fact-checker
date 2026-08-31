@@ -22,7 +22,8 @@ try:
     litellm.suppress_debug_info = True
 except ImportError:
     print(
-        "Error: litellm package not installed. Run: pip install litellm",
+        "Error: litellm not installed. Run scripts/bootstrap.sh and use the "
+        "interpreter it prints: PY=$(bash bootstrap.sh) && \"$PY\" verify.py ...",
         file=sys.stderr,
     )
     sys.exit(1)
@@ -64,7 +65,7 @@ NON_RETRYABLE_PATTERNS = (
 CODEX_CHATGPT_HINT = (
     "Codex is authenticated with a ChatGPT account, which only serves: "
     "gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna, gpt-5.5 "
-    "(gpt-5.4/-mini retire 2026-08-31; gpt-5.3-codex-spark needs ChatGPT Pro). "
+    "(gpt-5.4/-mini retired 2026-08-31; gpt-5.3-codex-spark needs ChatGPT Pro). "
     "For other models authenticate Codex with an API key or use the "
     "OPENAI_API_KEY litellm route (e.g. --models gpt-5.5-pro)."
 )
@@ -76,8 +77,24 @@ def is_non_retryable_error(error_msg: str) -> bool:
     return any(p in lower for p in NON_RETRYABLE_PATTERNS)
 
 
+# Claude Opus 4.7 and newer accept only temperature=1; sending any temperature
+# is rejected by litellm before the request leaves the process.
+CLAUDE_FIXED_TEMPERATURE_FROM = (4, 7)
+
+# Matches bare (claude-opus-5), dated (claude-opus-4-7-20260214), Bedrock
+# (anthropic.claude-opus-4-7-v1:0) and OpenRouter (anthropic/claude-opus-5)
+# ids. Deliberately does not match legacy claude-3-5-sonnet (version-last).
+_CLAUDE_VERSION_RE = re.compile(r"claude-(?:opus|sonnet|haiku|fable)-(\d+)(?:[-.](\d+))?")
+
+
+def claude_version(model: str) -> Optional[tuple[int, int]]:
+    """Parse an Anthropic model id into (major, minor), or None if not Claude."""
+    m = _CLAUDE_VERSION_RE.search(model.lower())
+    return (int(m.group(1)), int(m.group(2) or 0)) if m else None
+
+
 def is_reasoning_model(model: str) -> bool:
-    """Check if a model is a reasoning model (o-series, gpt-5).
+    """Check if a model is a reasoning model (o-series, gpt-5, Claude 4.7+).
 
     Reasoning models differ from standard models:
     - They ignore the temperature parameter (fixed internally)
@@ -100,6 +117,9 @@ def is_reasoning_model(model: str) -> bool:
         m = re.search(r"kimi-k(\d+(?:\.\d+)?)", model_lower)
         if m and float(m.group(1)) >= 2.5:
             return True
+    version = claude_version(model_lower)
+    if version and version >= CLAUDE_FIXED_TEMPERATURE_FROM:
+        return True
     return False
 
 
@@ -111,8 +131,10 @@ def uses_max_completion_tokens(model: str) -> bool:
     """
     if not is_reasoning_model(model):
         return False
-    # xAI and Moonshot use max_tokens even for reasoning models
+    # xAI, Moonshot and Anthropic use max_tokens even for reasoning models
     if model.lower().startswith(("xai/", "moonshot/")):
+        return False
+    if claude_version(model):
         return False
     return True
 
@@ -303,6 +325,8 @@ def call_codex_model(
             event = json.loads(line)
         except json.JSONDecodeError:
             continue
+        if not isinstance(event, dict):
+            continue
         etype = event.get("type")
         if etype == "item.completed":
             item = event.get("item", {})
@@ -313,7 +337,10 @@ def call_codex_model(
             input_tokens = usage.get("input_tokens", 0)
             output_tokens = usage.get("output_tokens", 0)
         elif etype in ("error", "turn.failed"):
-            msg = event.get("message") or event.get("error", {}).get("message")
+            err = event.get("error")
+            msg = event.get("message") or (
+                err.get("message") if isinstance(err, dict) else err
+            )
             if msg:
                 structured_error = msg
 
