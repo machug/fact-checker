@@ -36,7 +36,7 @@ npx skills add machug/fact-checker
 ### Requirements
 
 - Python 3.10+
-- `pip install litellm` (or `pip3` / `python3 -m pip` — the plugin will prompt you if this is missing)
+- Python dependencies from `requirements.txt`. The skill installs these itself on first run via `skills/fact-check/scripts/bootstrap.sh`, into `~/.cache/fact-checker/venv` (override with `FACT_CHECKER_VENV`). To install manually instead: `python3 -m pip install -r requirements.txt`
 
 ### Setting up LLM providers
 

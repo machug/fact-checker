@@ -23,7 +23,7 @@ except ImportError:
 _CLI_COSTS = {
     "codex/": {"input": 0.0, "output": 0.0},
     "gemini-cli/": {"input": 0.0, "output": 0.0},
-    "antigravity": {"input": 0.0, "output": 0.0},
+    "antigravity/": {"input": 0.0, "output": 0.0},
 }
 
 DEFAULT_COST = {"input": 5.00, "output": 15.00}
@@ -35,6 +35,8 @@ def get_model_cost(model: str) -> dict[str, float]:
     Falls back to DEFAULT_COST for unknown models.
     """
     # CLI tools — free (subscription-based)
+    if model == "antigravity":
+        return _CLI_COSTS["antigravity/"]
     for prefix, cost in _CLI_COSTS.items():
         if model.startswith(prefix):
             return cost
@@ -64,14 +66,12 @@ DEFAULT_CODEX_REASONING = "xhigh"
 
 # Models Codex CLI serves when authenticated with a ChatGPT account (not an
 # API key). Rotates with OpenAI's ChatGPT lineup — see
-# https://developers.openai.com/codex/models. Last verified 2026-08-10.
+# https://developers.openai.com/codex/models. Last verified 2026-08-31.
 CODEX_CHATGPT_MODELS = {
     "gpt-5.6-sol",
     "gpt-5.6-terra",
     "gpt-5.6-luna",
     "gpt-5.5",
-    "gpt-5.4",  # retires 2026-08-31
-    "gpt-5.4-mini",  # retires 2026-08-31
     "gpt-5.3-codex-spark",  # ChatGPT Pro only
 }
 
@@ -82,6 +82,8 @@ def codex_auth_mode() -> Optional[str]:
     try:
         data = json.loads(auth_path.read_text())
     except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(data, dict):
         return None
     mode = data.get("auth_mode")
     if mode:
@@ -110,7 +112,7 @@ def warn_codex_chatgpt_model_support(models: list[str]) -> None:
         print(
             f"Warning: Codex CLI is authenticated with a ChatGPT account, which "
             f"likely rejects: {', '.join(unsupported)}. ChatGPT-account models "
-            f"(as of 2026-08): gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna, gpt-5.5. "
+            f"(as of 2026-08-31): gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna, gpt-5.5. "
             f"Other models need Codex API-key auth or the OPENAI_API_KEY route.\n",
             file=sys.stderr,
         )
@@ -165,11 +167,11 @@ def get_available_providers() -> list[tuple[str, Optional[str], str]]:
         ("OpenAI", "OPENAI_API_KEY", "gpt-5.6-sol"),
         ("Anthropic", "ANTHROPIC_API_KEY", "claude-opus-5"),
         ("Google", "GEMINI_API_KEY", "gemini/gemini-3.1-pro-preview"),
-        ("xAI", "XAI_API_KEY", "xai/grok-4.5"),
+        ("xAI", "XAI_API_KEY", "xai/grok-4.6"),
         ("Mistral", "MISTRAL_API_KEY", "mistral/mistral-large"),
         ("Groq", "GROQ_API_KEY", "groq/llama-3.3-70b-versatile"),
         ("Deepseek", "DEEPSEEK_API_KEY", "deepseek/deepseek-v4-pro"),
-        ("ZAI (GLM)", "ZAI_API_KEY", "zai/glm-5.2"),
+        ("ZAI (GLM)", "ZAI_API_KEY", "zai/glm-5.3"),
         ("Moonshot (Kimi)", "MOONSHOT_API_KEY", "moonshot/kimi-k3"),
         ("MiniMax", "MINIMAX_API_KEY", "minimax/MiniMax-M3"),
         # Azure AI Foundry skipped from auto-detect — deployment names are user-specific
