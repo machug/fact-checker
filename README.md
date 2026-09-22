@@ -79,7 +79,7 @@ npm install -g @openai/codex    # Uses your ChatGPT subscription
 curl -fsSL https://antigravity.google/cli/install.sh | bash  # Uses your Google account (run `agy` once to sign in)
 ```
 
-Codex models use the `codex/<model>` prefix (e.g. `codex/gpt-5.6-sol`). Note: ChatGPT-account auth serves only the current ChatGPT lineup (gpt-5.6-sol/terra/luna, gpt-5.5) — other models need Codex API-key auth or `OPENAI_API_KEY`.
+Codex models use the `codex/<model>` prefix (e.g. `codex/gpt-6-astra`, `codex/gpt-5.6-sol`). Note: ChatGPT-account auth serves only the current ChatGPT lineup (gpt-6-astra on eligible plans, gpt-5.6-sol/terra/luna, gpt-5.5 until it retires on 2026-10-14) — other models need Codex API-key auth or `OPENAI_API_KEY`.
 
 Antigravity models use the `antigravity/<slug>` prefix (e.g. `antigravity/gemini-3.1-pro-high`); run `agy models` to list available slugs. Antigravity replaced Gemini CLI, whose consumer service was retired 2026-06-18 — the `gemini-cli/` prefix still works for enterprise licenses only.
 
