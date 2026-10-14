@@ -105,7 +105,8 @@ def is_reasoning_model(model: str) -> bool:
         f"/{p}" in model_lower for p in ("o1", "o3", "o4")
     ):
         return True
-    # gpt-6-astra (verified 2026-09-22) rejects temperature != 1 and max_tokens
+    # gpt-6-astra (verified 2026-09-22) and gpt-6.1-sol, gpt-6-sol, gpt-6-luna
+    # (verified 2026-10-14) reject temperature != 1 and max_tokens
     if "gpt-5" in model_lower or "gpt-6" in model_lower:
         return True
     # xAI reasoning models: grok-*-reasoning but NOT *-non-reasoning
