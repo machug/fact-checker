@@ -402,7 +402,7 @@ def resolve_antigravity_model(model: str) -> Optional[str]:
     """Extract the agy model slug from an antigravity/<slug> model string.
 
     `agy --model` accepts slugs exactly as listed by `agy models`
-    (e.g. gemini-3.1-pro-high, claude-sonnet-4-6, gpt-oss-120b-medium).
+    (e.g. gemini-3.8-flash-high, claude-sonnet-4-6, gpt-oss-120b-medium).
     Returns None for a bare "antigravity" (use agy's default model).
     """
     slug = model.split("/", 1)[1] if "/" in model else ""
