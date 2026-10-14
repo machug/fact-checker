@@ -64,8 +64,8 @@ NON_RETRYABLE_PATTERNS = (
 
 CODEX_CHATGPT_HINT = (
     "Codex is authenticated with a ChatGPT account, which only serves: "
-    "gpt-6-astra (eligible plans), gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna, gpt-5.5 (until 2026-10-14) "
-    "(gpt-5.4/-mini retired 2026-08-31; gpt-5.3-codex-spark needs ChatGPT Pro). "
+    "gpt-6.1-sol, gpt-6-sol, gpt-6-luna, gpt-6-astra (eligible plans), gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna "
+    "(gpt-5.4/-mini retired 2026-08-31; gpt-5.5 retired 2026-10-14; gpt-5.3-codex-spark needs ChatGPT Pro). "
     "For other models authenticate Codex with an API key or use the "
     "OPENAI_API_KEY litellm route (e.g. --models gpt-5.5-pro)."
 )
@@ -402,7 +402,7 @@ def resolve_antigravity_model(model: str) -> Optional[str]:
     """Extract the agy model slug from an antigravity/<slug> model string.
 
     `agy --model` accepts slugs exactly as listed by `agy models`
-    (e.g. gemini-3.1-pro-high, claude-sonnet-4-6, gpt-oss-120b-medium).
+    (e.g. gemini-3.8-flash-high, claude-sonnet-4-6, gpt-oss-120b-medium).
     Returns None for a bare "antigravity" (use agy's default model).
     """
     slug = model.split("/", 1)[1] if "/" in model else ""
