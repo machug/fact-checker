@@ -83,6 +83,8 @@ Codex models use the `codex/<model>` prefix (e.g. `codex/gpt-6.2-sol`, `codex/gp
 
 Antigravity models use the `antigravity/<slug>` prefix (e.g. `antigravity/gemini-3.8-flash-high`, `antigravity/gemini-4-argon-high`); run `agy models` to list available slugs. Antigravity replaced Gemini CLI, whose consumer service was retired 2026-06-18 — the `gemini-cli/` prefix still works for enterprise licenses only.
 
+For Gemini, the lightest route is a free key from [Google AI Studio](https://aistudio.google.com/apikey): `export GEMINI_API_KEY=...` and use `gemini/` models, nothing else to install. If you set the key with Google's `gemini-api configure`, it lives in the OS keychain and this skill cannot see it; export it as well.
+
 Azure AI Foundry models use the `foundry/<deployment-name>` prefix and the `azure-ai-inference` SDK (not LiteLLM). Set `AZURE_AI_API_BASE` to your project endpoint (e.g. `https://your-resource.services.ai.azure.com/api/projects/your-project`).
 
 All other models and pricing (USD) are discovered dynamically from [LiteLLM's model registry](https://github.com/BerriAI/litellm) — no hardcoded model lists to go stale. Run `python3 verify.py providers` to see what's detected on your machine.
